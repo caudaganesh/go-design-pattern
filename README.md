@@ -1,4 +1,5 @@
-![alt text](https://codecov.io/gh/caudaganesh/go-design-pattern/branch/master/graph/badge.svg)
+[![Go Report Card](https://goreportcard.com/badge/github.com/caudaganesh/go-design-pattern)](https://goreportcard.com/report/github.com/caudaganesh/go-design-pattern)
+[![Codecov](https://codecov.io/gh/caudaganesh/go-design-pattern/branch/master/graph/badge.svg)](https://codecov.io/gh/caudaganesh/go-design-pattern)
 
 # go-design-pattern
 
