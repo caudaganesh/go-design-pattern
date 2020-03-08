@@ -2,78 +2,105 @@ package handler
 
 import (
 	"errors"
-	"reflect"
+	"github.com/caudaganesh/go-design-pattern/internal/delivery/mocks"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
-	"github.com/caudaganesh/go-design-pattern/internal/delivery/rest/restentity"
-	"github.com/caudaganesh/go-design-pattern/internal/entity"
-	"github.com/caudaganesh/go-design-pattern/internal/mocks"
+	"github.com/caudaganesh/go-design-pattern/internal/delivery/deliveryentity"
+	"github.com/caudaganesh/go-design-pattern/internal/delivery/rest/echorest"
 	"github.com/golang/mock/gomock"
+	"github.com/labstack/echo"
 )
 
 func TestNewUserHandler(t *testing.T) {
-	userHandler := NewUserHandler(nil)
+	userCtrl := NewUserHandler(nil)
 
-	if userHandler == nil {
-		t.Error("should init user handler")
+	if userCtrl == nil {
+		t.Error("should init the new user handler")
 	}
 }
 
-func Test_userHandler_GetUser(t *testing.T) {
-	type mockGetUser struct {
-		res entity.User
+func Test_UserHandler_GetUser(t *testing.T) {
+	type mockUserHandler struct {
+		res deliveryentity.GetUserResponse
 		err error
 	}
+
 	tests := []struct {
-		name string
-		mockGetUser
-		request restentity.GetUserRequest
-		want    restentity.GetUserResponse
-		wantErr bool
+		userID string
+		mockUserHandler
+		mockHelperErr error
+		name          string
+		wantErr       bool
 	}{
 		{
-			name: "error get user from uc, return error",
-			mockGetUser: mockGetUser{
+			name:    "fail to get user id from context, return error",
+			wantErr: true,
+		},
+		{
+			name:   "valid user id, error at handler, return error",
+			userID: "1",
+			mockUserHandler: mockUserHandler{
 				err: errors.New("some error"),
 			},
 			wantErr: true,
 		},
 		{
-			name: "no error get user from uc, return response",
-			mockGetUser: mockGetUser{
-				res: entity.User{
-					FirstName: "firstname",
-					LastName:  "lastname",
-					ID:        1,
-					UserName:  "username",
+			name:   "success get user, error parse response data, return error",
+			userID: "1",
+			mockUserHandler: mockUserHandler{
+				res: deliveryentity.GetUserResponse{
+					ID:       1,
+					FullName: "test123",
 				},
 			},
-			want: restentity.GetUserResponse{
-				ID:       1,
-				FullName: "firstname lastname",
-				UserName: "username",
+			mockHelperErr: errors.New("some error"),
+			wantErr:       true,
+		},
+		{
+			name:   "success get user, success parse response data, return nil",
+			userID: "1",
+			mockUserHandler: mockUserHandler{
+				res: deliveryentity.GetUserResponse{
+					ID:       1,
+					FullName: "test123",
+				},
 			},
 		},
 	}
 	for _, tt := range tests {
+		ctrl := gomock.NewController(t)
+		mockUserHandler := mocks.NewMockUserAdapter(ctrl)
+		mockUserHandler.EXPECT().
+			GetUser(gomock.Any()).
+			Return(tt.mockUserHandler.res, tt.mockUserHandler.err)
+
+		e := echo.New()
+		r := e.Router()
+		r.Add(http.MethodGet, "user/:user_id", func(echo.Context) error { return nil })
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+
+		c.SetPath("/user/:user_id")
+		c.SetParamNames("user_id")
+		c.SetParamValues(tt.userID)
+
+		mockRespHelper := mocks.NewMockResponseHelper(ctrl)
+		mockRespHelper.EXPECT().
+			ResponseData(c, tt.mockUserHandler.res).
+			Return(tt.mockHelperErr)
+
 		t.Run(tt.name, func(t *testing.T) {
-			ctrl := gomock.NewController(t)
-			mockUserUC := mocks.NewMockUserUC(ctrl)
-			mockUserUC.EXPECT().
-				GetUser(tt.request.ID).
-				Return(tt.mockGetUser.res, tt.mockGetUser.err)
-
 			u := &userHandler{
-				userUC: mockUserUC,
+				adapter: mockUserHandler,
+				helper: echorest.Helpers{
+					Response: mockRespHelper,
+				},
 			}
-
-			got, err := u.GetUser(tt.request)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("userHandler.GetUser() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("userHandler.GetUser() = %v, want %v", got, tt.want)
+			if err := u.GetUser(c); (err != nil) != tt.wantErr {
+				t.Errorf("UserHandler.GetUser() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

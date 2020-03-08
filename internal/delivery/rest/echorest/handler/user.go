@@ -1,32 +1,46 @@
 package handler
 
 import (
-	"github.com/caudaganesh/go-design-pattern/internal"
+	"errors"
+	"strconv"
+
+	"github.com/caudaganesh/go-design-pattern/internal/delivery"
+	"github.com/caudaganesh/go-design-pattern/internal/delivery/deliveryentity"
+	"github.com/caudaganesh/go-design-pattern/internal/delivery/rest/constants"
 	"github.com/caudaganesh/go-design-pattern/internal/delivery/rest/echorest"
-	"github.com/caudaganesh/go-design-pattern/internal/delivery/rest/restentity"
+	"github.com/caudaganesh/go-design-pattern/internal/delivery/rest/echorest/helper"
+	"github.com/labstack/echo"
 )
 
 type userHandler struct {
-	userUC internal.UserUC
+	adapter delivery.UserAdapter
+	helper  echorest.Helpers
 }
 
-// NewUserHandler init new user handler
-func NewUserHandler(userUC internal.UserUC) echorest.UserHandler {
-	return &userHandler{
-		userUC,
+// NewUserHandler init user handler for echo
+func NewUserHandler(adapter delivery.UserAdapter) echorest.UserHandler {
+	helper := echorest.Helpers{
+		Response: helper.NewResponseHelper(),
 	}
+	userCtrl := &userHandler{
+		adapter: adapter,
+		helper:  helper,
+	}
+
+	return userCtrl
 }
 
-func (u *userHandler) GetUser(request restentity.GetUserRequest) (restentity.GetUserResponse, error) {
-	res := restentity.GetUserResponse{}
-	user, err := u.userUC.GetUser(request.ID)
+func (u *userHandler) GetUser(ctx echo.Context) error {
+	userID, err := strconv.Atoi(ctx.Param(constants.UserID))
 	if err != nil {
-		return res, err
+		return errors.New("invalid user id")
 	}
 
-	res.ID = user.ID
-	res.UserName = user.UserName
-	res.SetFullName(user.FirstName, user.LastName)
+	req := deliveryentity.GetUserRequest{ID: userID}
+	res, err := u.adapter.GetUser(req)
+	if err != nil {
+		return err
+	}
 
-	return res, nil
+	return u.helper.Response.ResponseData(ctx, res)
 }

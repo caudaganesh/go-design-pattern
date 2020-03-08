@@ -4,7 +4,7 @@ import (
 	"github.com/labstack/echo"
 )
 
-// UserController user controller
-type UserController interface {
+// UserHandler user handler
+type UserHandler interface {
 	GetUser(ctx echo.Context) error
 }

@@ -1,4 +1,4 @@
-package restentity
+package deliveryentity
 
 import "testing"
 
