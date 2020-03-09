@@ -2,13 +2,13 @@ package handler
 
 import (
 	"errors"
-	"github.com/caudaganesh/go-design-pattern/internal/delivery/mocks"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/caudaganesh/go-design-pattern/internal/delivery/deliveryentity"
-	"github.com/caudaganesh/go-design-pattern/internal/delivery/rest/echorest"
+	"github.com/caudaganesh/go-design-pattern/internal/delivery/mocks"
+	"github.com/caudaganesh/go-design-pattern/internal/delivery/rest/echoserver"
 	"github.com/golang/mock/gomock"
 	"github.com/labstack/echo"
 )
@@ -95,7 +95,7 @@ func Test_UserHandler_GetUser(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			u := &userHandler{
 				adapter: mockUserHandler,
-				helper: echorest.Helpers{
+				helper: echoserver.Helpers{
 					Response: mockRespHelper,
 				},
 			}

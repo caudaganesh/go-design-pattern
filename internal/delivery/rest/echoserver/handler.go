@@ -1,4 +1,4 @@
-package echorest
+package echoserver
 
 import (
 	"github.com/labstack/echo"

@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/caudaganesh/go-design-pattern/internal/delivery/rest/constants"
-	"github.com/caudaganesh/go-design-pattern/internal/delivery/rest/echorest/handler"
+	"github.com/caudaganesh/go-design-pattern/internal/delivery/rest/echoserver/handler"
 	"github.com/labstack/echo"
 )
 

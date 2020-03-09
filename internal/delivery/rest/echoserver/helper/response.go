@@ -4,14 +4,14 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/caudaganesh/go-design-pattern/internal/delivery/rest/echorest"
+	"github.com/caudaganesh/go-design-pattern/internal/delivery/rest/echoserver"
 	"github.com/labstack/echo"
 )
 
 type responseHelper struct{}
 
 // NewResponseHelper init new response helper
-func NewResponseHelper() echorest.ResponseHelper {
+func NewResponseHelper() echoserver.ResponseHelper {
 	return &responseHelper{}
 }
 
