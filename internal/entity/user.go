@@ -25,6 +25,6 @@ const (
 // access level
 const (
 	AccessLevel1 = 1
-	AcessLevel2  = 2
+	AccessLevel2 = 2
 	AccessLevel3 = 3
 )
