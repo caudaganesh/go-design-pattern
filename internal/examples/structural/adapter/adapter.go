@@ -1,4 +1,4 @@
-package delivery
+package adapter
 
 import (
 	"github.com/caudaganesh/go-design-pattern/internal/delivery/deliveryentity"
