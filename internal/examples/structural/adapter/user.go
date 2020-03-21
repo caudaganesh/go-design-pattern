@@ -2,22 +2,21 @@ package adapter
 
 import (
 	"github.com/caudaganesh/go-design-pattern/internal"
-	"github.com/caudaganesh/go-design-pattern/internal/delivery"
 	"github.com/caudaganesh/go-design-pattern/internal/delivery/deliveryentity"
 )
 
-type userHandler struct {
+type userHandlerAdapter struct {
 	userUC internal.UserUC
 }
 
-// NewUserHandler init new user adapter
-func NewUserHandler(userUC internal.UserUC) delivery.UserAdapter {
-	return &userHandler{
+// NewUserHandlerAdapter init new user adapter
+func NewUserHandlerAdapter(userUC internal.UserUC) UserAdapter {
+	return &userHandlerAdapter{
 		userUC,
 	}
 }
 
-func (u *userHandler) GetUser(request deliveryentity.GetUserRequest) (deliveryentity.GetUserResponse, error) {
+func (u *userHandlerAdapter) GetUser(request deliveryentity.GetUserRequest) (deliveryentity.GetUserResponse, error) {
 	res := deliveryentity.GetUserResponse{}
 	user, err := u.userUC.GetUser(request.ID)
 	if err != nil {

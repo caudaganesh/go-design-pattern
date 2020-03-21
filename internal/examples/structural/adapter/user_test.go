@@ -12,7 +12,7 @@ import (
 )
 
 func TestNewUserHandler(t *testing.T) {
-	userHandler := NewUserHandler(nil)
+	userHandler := NewUserHandlerAdapter(nil)
 
 	if userHandler == nil {
 		t.Error("should init user adapter")
@@ -63,7 +63,7 @@ func Test_userHandler_GetUser(t *testing.T) {
 				GetUser(tt.request.ID).
 				Return(tt.mockGetUser.res, tt.mockGetUser.err)
 
-			u := &userHandler{
+			u := &userHandlerAdapter{
 				userUC: mockUserUC,
 			}
 

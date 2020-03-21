@@ -4,21 +4,21 @@ import (
 	"errors"
 	"strconv"
 
-	"github.com/caudaganesh/go-design-pattern/internal/delivery"
 	"github.com/caudaganesh/go-design-pattern/internal/delivery/deliveryentity"
 	"github.com/caudaganesh/go-design-pattern/internal/delivery/rest/constants"
 	"github.com/caudaganesh/go-design-pattern/internal/delivery/rest/echoserver"
 	"github.com/caudaganesh/go-design-pattern/internal/delivery/rest/echoserver/helper"
+	"github.com/caudaganesh/go-design-pattern/internal/examples/structural/adapter"
 	"github.com/labstack/echo"
 )
 
 type userHandler struct {
-	adapter delivery.UserAdapter
+	adapter adapter.UserAdapter
 	helper  echoserver.Helpers
 }
 
 // NewUserHandler init user handler for echo
-func NewUserHandler(adapter delivery.UserAdapter) echoserver.UserHandler {
+func NewUserHandler(adapter adapter.UserAdapter) echoserver.UserHandler {
 	helper := echoserver.Helpers{
 		Response: helper.NewResponseHelper(),
 	}
